@@ -1,9 +1,9 @@
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm";
-import { OfflineSigner } from "@cosmjs/launchpad";
+import { LcdClient, OfflineSigner, StakingExtension } from "@cosmjs/launchpad";
 import * as React from "react";
 import { useState } from "react";
 import { AppConfig } from "../config";
-import { createClient, loadOrCreateWallet } from "./sdk";
+import { createClient, createStakingClient, loadOrCreateWallet } from "./sdk";
 
 interface CosmWasmContextType {
   readonly initialized: boolean;
@@ -11,6 +11,7 @@ interface CosmWasmContextType {
   readonly init: () => void;
   readonly clear: () => void;
   readonly getClient: () => SigningCosmWasmClient;
+  readonly getStakingClient: () => LcdClient & StakingExtension;
 }
 
 const defaultContext: CosmWasmContextType = {
@@ -23,6 +24,9 @@ const defaultContext: CosmWasmContextType = {
     return;
   },
   getClient: (): SigningCosmWasmClient => {
+    throw new Error("not yet initialized");
+  },
+  getStakingClient: (): LcdClient & StakingExtension => {
     throw new Error("not yet initialized");
   },
 };
@@ -62,6 +66,8 @@ export function SdkProvider({ config, loadWallet, children }: SdkProviderProps):
           }
         }
 
+        const stakingClient = createStakingClient(config.httpUrl);
+
         setValue({
           initialized: true,
           address,
@@ -70,6 +76,7 @@ export function SdkProvider({ config, loadWallet, children }: SdkProviderProps):
           },
           clear,
           getClient: () => client,
+          getStakingClient: () => stakingClient,
         });
       });
   }

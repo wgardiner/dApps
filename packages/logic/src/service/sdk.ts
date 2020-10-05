@@ -1,6 +1,15 @@
 import { CosmWasmFeeTable, SigningCosmWasmClient } from "@cosmjs/cosmwasm";
 import { Bip39, Random } from "@cosmjs/crypto";
-import { GasLimits, GasPrice, makeCosmoshubPath, OfflineSigner, Secp256k1Wallet } from "@cosmjs/launchpad";
+import {
+  GasLimits,
+  GasPrice,
+  LcdClient,
+  makeCosmoshubPath,
+  OfflineSigner,
+  Secp256k1Wallet,
+  setupStakingExtension,
+  StakingExtension,
+} from "@cosmjs/launchpad";
 import { AppConfig } from "../config";
 
 // generateMnemonic will give you a fresh mnemonic
@@ -43,4 +52,8 @@ export async function createClient(config: AppConfig, signer: OfflineSigner): Pr
   };
 
   return new SigningCosmWasmClient(config.httpUrl, firstAddress, signer, gasPrice, gasLimits);
+}
+
+export function createStakingClient(apiUrl: string): LcdClient & StakingExtension {
+  return LcdClient.withExtensions({ apiUrl }, setupStakingExtension);
 }
