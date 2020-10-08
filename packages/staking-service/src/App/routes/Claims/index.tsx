@@ -1,9 +1,12 @@
 import { PageLayout } from "@cosmicdapp/design";
 import { Button, Typography } from "antd";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DataList } from "../../components/DataList";
 import { HeaderBackMenu } from "../../components/HeaderBackMenu";
 import { ButtonStack, HeaderTitleStack, MainStack } from "./style";
+import { useSdk, useAccount } from "@cosmicdapp/logic";
+import { useStakingValidator } from "../../utils/staking";
+import { useParams } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -23,12 +26,31 @@ const mockClaims: MockClaim[] = [
   { Date: "18/Nov/20", Tokens: "140,000", Atom: "425" },
 ];
 
+interface ClaimsParams {
+  readonly validatorAddress: string;
+}
+
 export function Claims(): JSX.Element {
   const [claimIndex, setClaimIndex] = useState<number>();
 
   const showClaimDetail = claimIndex !== undefined;
   const disableNext = claimIndex === mockClaims.length - 1;
   const disablePrevious = claimIndex === 0;
+
+  const { getClient } = useSdk();
+  const { validatorAddress } = useParams<ClaimsParams>();
+  const validator = useStakingValidator(validatorAddress);
+  const { account } = useAccount();
+
+  useEffect(() => {
+    if (validator) {
+      getClient()
+        // Use contract address for contract staking
+        .queryContractSmart(validatorAddress, { address: account.address })
+        .then(console.log)
+        .catch(console.error);
+    }
+  }, [validator, validatorAddress, getClient, account.address]);
 
   return (
     <PageLayout>
