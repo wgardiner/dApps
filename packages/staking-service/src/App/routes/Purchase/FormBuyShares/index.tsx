@@ -10,7 +10,7 @@ import { FormField, FormStack } from "./style";
 
 const { Text } = Typography;
 
-export interface FormBuySharesFields {
+interface FormBuySharesFields {
   readonly amount: string;
 }
 
@@ -23,10 +23,8 @@ export function FormBuyShares({ validator }: FormBuySharesProps): JSX.Element {
   const { getClient } = useSdk();
 
   function submitBuyShares({ amount }: FormBuySharesFields) {
-    // TODO: get from config? Can't test due to insufficient funds
-    const delegateToken = "ureef";
-    const nativeAmountString = displayAmountToNative(amount, config.coinMap, delegateToken);
-    const nativeAmountCoin: Coin = { amount: nativeAmountString, denom: delegateToken };
+    const nativeAmountString = displayAmountToNative(amount, config.coinMap, config.stakingToken);
+    const nativeAmountCoin: Coin = { amount: nativeAmountString, denom: config.stakingToken };
 
     const delegateMsg: MsgDelegate = {
       type: "cosmos-sdk/MsgDelegate",
