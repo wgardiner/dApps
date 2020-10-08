@@ -53,11 +53,11 @@ export function ValidatorHome(): JSX.Element {
   }
 
   function goToWithdraw() {
-    history.push(pathWithdraw);
+    history.push(`${pathWithdraw}/${validatorAddress}`);
   }
 
   function goToClaims() {
-    history.push(pathClaims);
+    history.push(`${pathClaims}/${validatorAddress}`);
   }
 
   return (
