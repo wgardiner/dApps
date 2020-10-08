@@ -63,6 +63,14 @@ export function SdkProvider({ config, loadWallet, children }: SdkProviderProps):
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ ticker: config.faucetToken, address }),
             });
+
+            if (config.faucetStakingToken) {
+              await fetch(config.faucetUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ticker: config.faucetStakingToken, address }),
+              });
+            }
           }
         }
 
