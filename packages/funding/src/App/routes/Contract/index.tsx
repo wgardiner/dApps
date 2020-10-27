@@ -1,14 +1,17 @@
 import { BackButton, Loading, PageLayout, YourAccount } from "@cosmicdapp/design";
-import { Button, Typography } from "antd";
+import { Button, Typography, Input } from "antd";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import backArrowIcon from "../../assets/backArrow.svg";
 import { pathHome } from "../../paths";
-import { FormSearchName } from "./components/FormSearchName";
-import { SearchResult } from "./components/SearchResult";
+import { Link } from "react-router-dom";
+// import { FormSearchName } from "./components/FormSearchName";
+// import { SearchResult } from "./components/SearchResult";
 import { BackSearchResultStack, MainStack, SearchStack } from "./style";
+import { pathContract } from "../../paths";
+
 import { /*getErrorFromStackTrace, printableCoin, useAccount,*/ useError, useSdk } from "@cosmicdapp/logic";
-import { string } from "yup";
+// import { string } from "yup";
 
 
 const { Title, Text } = Typography;
@@ -76,6 +79,39 @@ export function Contract(): JSX.Element {
 
   }, [setError, address, getClient, name]);
 
+
+  const [votesInputState, setVotesInputState] = useState({});
+  const onVoteCreate = (id) => async (ev) => {
+    // console.log(ev);
+    // console.log(ev.target.value);
+    const amount = votesInputState[id];
+    const handleMsg = {
+      create_vote: {
+        proposal_id: id,
+      },
+    };
+    console.log('create vote',id, amount);
+    // console.log(`execute('create_vote', { proposal: ${id}, amount: [{amount: ${amount}}]})`);
+    try {
+      const res = await getClient()
+        .execute(address, handleMsg, 'create vote', [{ denom: "ushell", amount: String(amount) }]);
+      // getClient.execute()
+      console.log(res);
+      // getProposals();
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  const onChangeVotesInputs = (id) => ({ target: { value }}) => {
+    // console.log(ev);
+    // console.log(ev.target.value);
+    setVotesInputState({
+      ...votesInputState,
+      [id]: value,
+    })
+  }
+
   async function onProposalCreate() {
     const rand = Math.floor(Math.random() * 1e6);
     const handleMsg = {
@@ -95,7 +131,7 @@ export function Contract(): JSX.Element {
 
     try {
       const res = await getClient()
-        .execute(address, handleMsg, 'create proposal', [{ denom: "ushell", amount: "500000" }]);
+        .execute(address, handleMsg, 'create proposal', [{ denom: "ushell", amount: "1000" }]);
         // getClient.execute()
       console.log(res);
       getProposals();
@@ -118,12 +154,32 @@ export function Contract(): JSX.Element {
               <Text>({address})</Text>
               {/* <FormSearchName initialName={name} setSearchedName={setLowercaseSearchedName} /> */}
             </SearchStack>
-            {proposals.map((proposal) => (
-              <div>{proposal}</div>
-              // // <Link key={address} to={`${pathContract}/${label.toLowerCase()}/${address}/`}>
-              //   <Button type="primary">{label}</Button>
-              // </Link>
-            ))}
+            <ul>
+              {proposals.map((proposal, i) => (
+                <li key={proposal.id}>
+                  <strong>
+                    {proposal.name}
+                  </strong>
+                  <br/>
+                  {proposal.description}
+                  <br/>
+                  id: {proposal.id}
+
+                  <Input
+                    placeholder="amount in ushell"
+                    type="number"
+                    onChange={onChangeVotesInputs(proposal.id)}
+                  />
+                  <Button type="primary" onClick={onVoteCreate(proposal.id)}>
+                    Vote / Donate
+                  </Button>
+
+                </li>
+                // <Link key={proposal.id} to={`${pathContract}/${label.toLowerCase()}/${address}/`}>
+                //   <Button type="primary">{proposal.name}</Button>
+                // </Link>
+              ))}
+            </ul>
             <Button type="primary" onClick={onProposalCreate}>New Proposal</Button>
             {/* {searchedName && (
               <SearchResult

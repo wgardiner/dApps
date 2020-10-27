@@ -72,10 +72,15 @@ export function Home(): JSX.Element {
   }, [getClient, setError]);
 
   async function onCreateInstantiation() {
+    const rand = Math.floor(Math.random() * 1e6);
     const initMsg = {
-      name: 'My Funding Round 1',
+      name: `My Funding Round ${rand}`,
       proposer_whitelist: [],
       voter_whitelist: [],
+      proposal_period_start: Math.floor(Date.now() / 1e3),
+      proposal_period_end: Math.floor(Date.now() / 1e3) + 60 * 60 * 24 * 31 * 12,
+      voting_period_start: Math.floor(Date.now() / 1e3),
+      voting_period_end: Math.floor(Date.now() / 1e3) + 60 * 60 * 24 * 31 * 12,
     }
     const initOptions = {
       memo: 'memo',
@@ -85,7 +90,7 @@ export function Home(): JSX.Element {
     // TODO: show spinner while loading
     try {
       const res = await getClient()
-        .instantiate(139, initMsg, 'Funding 1', initOptions);
+        .instantiate(139, initMsg, `Funding ${rand}`, initOptions);
       // TODO: show success message
       // setContracts([...contracts, ])
       getInstantiationsList();
