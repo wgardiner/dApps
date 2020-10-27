@@ -17,7 +17,9 @@ const coralnet: AppConfig = {
   faucetUrl: "https://faucet.coralnet.cosmwasm.com/credit",
   faucetToken: "SHELL",
   addressPrefix: "coral",
-  codeId: 5,
+  // codeId: 5,
+  codeId: 139,
+
 };
 
 // REACT_APP_LOCAL is set via `yarn start:local`

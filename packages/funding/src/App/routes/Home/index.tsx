@@ -10,18 +10,92 @@ import { ContractStack, MainStack } from "./style";
 
 const { Title } = Typography;
 
+// reference for init message
+// export interface MsgInstantiateContract extends Msg {
+//   readonly type: "wasm/MsgInstantiateContract";
+//   readonly value: {
+//     /** Bech32 account address */
+//     readonly sender: string;
+//     /** ID of the Wasm code that was uploaded before */
+//     readonly code_id: string;
+//     /** Human-readable label for this contract */
+//     readonly label: string;
+//     /** Init message as JavaScript object */
+//     readonly init_msg: any;
+//     readonly init_funds: readonly Coin[];
+//     /** Bech32-encoded admin address */
+//     readonly admin?: string;
+//   };
+// }
+// export interface InstantiateOptions {
+//   readonly memo?: string;
+//   readonly transferAmount?: readonly Coin[];
+//   /**
+//    * A bech32 encoded address of an admin account.
+//    * Caution: an admin has the privilege to upgrade a contract. If this is not desired, do not set this value.
+//    */
+//   readonly admin?: string;
+// }
+
+// reference for our initmsg
+// pub struct InitMsg {
+//     // pub count: i32,
+//     // Coins for funding pool are attached to TX
+//     pub name: String,
+//     pub proposer_whitelist: Vec<HumanAddr>,
+//     pub voter_whitelist: Vec<HumanAddr>,
+//     // pub proposal_min_period: Option<u32>,
+//     // pub voting_min_period: Option<u32>,
+//     pub proposal_period_start: Option<u64>,
+//     pub proposal_period_end: Option<u64>,
+//     pub voting_period_start: Option<u64>,
+//     pub voting_period_end: Option<u64>,
+//     // pub funding_formula: Option<String>,
+// }
+
+
 export function Home(): JSX.Element {
   const { setError } = useError();
   const { getClient } = useSdk();
 
   const [contracts, setContracts] = useState<readonly Contract[]>([]);
 
-  useEffect(() => {
+  async function getInstantiationsList() {
     getClient()
       .getContracts(config.codeId)
       .then((contracts) => setContracts(contracts))
       .catch(setError);
+  }
+
+  useEffect(() => {
+    getInstantiationsList();
   }, [getClient, setError]);
+
+  async function onCreateInstantiation() {
+    const initMsg = {
+      name: 'My Funding Round 1',
+      proposer_whitelist: [],
+      voter_whitelist: [],
+    }
+    const initOptions = {
+      memo: 'memo',
+      transferAmount: [{ denom: "ushell", amount: "10000" }],
+    }
+    // TODO: make this into a form
+    // TODO: show spinner while loading
+    try {
+      const res = await getClient()
+        .instantiate(139, initMsg, 'Funding 1', initOptions);
+      // TODO: show success message
+      // setContracts([...contracts, ])
+      getInstantiationsList();
+    } catch (err) {
+      setError(err);
+    }
+
+  }
+
+
 
   return (
     <PageLayout>
@@ -30,9 +104,13 @@ export function Home(): JSX.Element {
         <ContractStack tag="nav">
           {contracts.map(({ label, address }) => (
             <Link key={address} to={`${pathContract}/${label.toLowerCase()}/${address}`}>
+            {/* <Link key={address} to={`${pathContract}/${address}`}> */}
               <Button type="primary">{label}</Button>
             </Link>
           ))}
+        </ContractStack>
+        <ContractStack>
+          <Button type="primary" onClick={onCreateInstantiation}>New Instantiation</Button>
         </ContractStack>
         <YourAccount tag="footer" />
       </MainStack>

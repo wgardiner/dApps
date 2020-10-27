@@ -22,6 +22,7 @@ export function App(): JSX.Element {
               <Route exact path={pathLogin} component={Login} />
               <ProtectedSwitch authPath={pathLogin}>
                 <Route exact path={pathHome} component={Home} />
+                {/* <Route exact path={`${pathContract}/:address`} component={Contract} /> */}
                 <Route exact path={`${pathContract}/:label/:address/:name?`} component={Contract} />
                 <Route
                   exact
