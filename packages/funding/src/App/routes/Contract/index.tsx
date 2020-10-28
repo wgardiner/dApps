@@ -1,5 +1,5 @@
 import { BackButton, Loading, PageLayout, YourAccount } from "@cosmicdapp/design";
-import { Button, Typography, Input } from "antd";
+import { Button, Typography, Input, Card } from "antd";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import backArrowIcon from "../../assets/backArrow.svg";
@@ -154,9 +154,9 @@ export function Contract(): JSX.Element {
               <Text>({address})</Text>
               {/* <FormSearchName initialName={name} setSearchedName={setLowercaseSearchedName} /> */}
             </SearchStack>
-            <ul>
+
               {proposals.map((proposal, i) => (
-                <li key={proposal.id}>
+                <Card key={proposal.id}>
                   <strong>
                     {proposal.name}
                   </strong>
@@ -174,12 +174,11 @@ export function Contract(): JSX.Element {
                     Vote / Donate
                   </Button>
 
-                </li>
+                </Card>
                 // <Link key={proposal.id} to={`${pathContract}/${label.toLowerCase()}/${address}/`}>
                 //   <Button type="primary">{proposal.name}</Button>
                 // </Link>
               ))}
-            </ul>
             <Button type="primary" onClick={onProposalCreate}>New Proposal</Button>
             {/* {searchedName && (
               <SearchResult

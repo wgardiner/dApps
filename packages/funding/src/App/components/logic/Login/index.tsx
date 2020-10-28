@@ -8,7 +8,7 @@ import {
   WalletLoader,
 
 } from "@cosmicdapp/logic";
-import { Button, Typography, Modal, Input } from "antd";
+import { Button, Typography, Modal, Input, Space, Card, } from "antd";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { PageLayout } from "../../layout/PageLayout";
@@ -90,6 +90,13 @@ export function Login({ addressPrefix, pathAfterLogin, appName, appLogo }: Login
     setMnemonic(value);
   }
 
+  function onSignOut() {
+    setMnemonic('');
+    localStorage.removeItem('burner-wallet');
+  }
+
+
+
   useEffect(() => {
     if (sdk.initialized) {
       refreshAccount();
@@ -112,41 +119,58 @@ export function Login({ addressPrefix, pathAfterLogin, appName, appLogo }: Login
     <PageLayout>
       <MainStack>
         {/* <img src={appLogo} alt="CosmWasm logo" /> */}
+
         <WelcomeStack>
           <Typography>
             <Title level={2}>Funding</Title>
             {/* <LightText>Welcome to your {appName}</LightText> */}
           </Typography>
           {error && <ErrorText>{error}</ErrorText>}
+          <Card>
+            <WelcomeStack>
 
+              { localStorage.getItem('burner-wallet') ? (
+                  <>
+                    <Button type="primary" onClick={initBrowser}>
+                      Login (saved credentials)
+                    </Button>
+                    <Button onClick={onSignOut}>
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    {/* <TextArea onChange={onMnemonicChange} value={mnemonic} /> */}
+                    <Space direction="vertical">
+                      <Input
+                        type="password"
+                        onChange={onMnemonicChange}
+                        value={mnemonic}
+                        placeholder="Mnemonic"
+                        // hidden={true}
+                      />
+                      <Button type="primary" onClick={initBrowserWithMnemonic}>
+                        Login
+                      </Button>
+                    </Space>
+                    <Button onClick={initBrowser}>
+                      Create Account
+                    </Button>
+                  </>
 
-
-          { localStorage.getItem('burner-wallet') ? (
-              <Button type="primary" onClick={initBrowser}>
-                Login (saved)
+              )}
+              {/* <Button type="primary" disabled={disableLedgerLogin()} onClick={initLedger}>
+                Ledger (Secure)
               </Button>
-            ) : (
-              <>
-                <LightText>Enter your mnemonic to login or create a new account</LightText>
+              <Button type="primary" disabled>
+                Keplr (Secure)
+              </Button> */}
+              {/* <Modal visible={modalIsVisible} onOk={onModalOk} onCancel={onModalCancel}>
                 <TextArea onChange={onMnemonicChange} value={mnemonic} />
-                <Button type="primary" onClick={initBrowserWithMnemonic}>
-                  Login
-                </Button>
-                <Button type="primary" onClick={initBrowser}>
-                  Create Account
-                </Button>
-              </>
+              </Modal> */}
+            </WelcomeStack>
 
-          )}
-          {/* <Button type="primary" disabled={disableLedgerLogin()} onClick={initLedger}>
-            Ledger (Secure)
-          </Button>
-          <Button type="primary" disabled>
-            Keplr (Secure)
-          </Button> */}
-          {/* <Modal visible={modalIsVisible} onOk={onModalOk} onCancel={onModalCancel}>
-            <TextArea onChange={onMnemonicChange} value={mnemonic} />
-          </Modal> */}
+          </Card>
         </WelcomeStack>
       </MainStack>
     </PageLayout>

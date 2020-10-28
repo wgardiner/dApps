@@ -4,6 +4,7 @@ import { PageLayout } from "./component";
 export const StyledPageLayout = styled(PageLayout)`
   --max-width: 22rem;
   --gap: var(--s8);
+  background-color: var(--color-gray-light);
 
   padding: var(--s4);
 

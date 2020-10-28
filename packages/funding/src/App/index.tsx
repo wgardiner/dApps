@@ -1,4 +1,4 @@
-import { GlobalStyle } from "@cosmicdapp/design";
+import { GlobalStyle } from '../theme/GlobalStyle';
 import { AccountProvider, ErrorProvider, ProtectedSwitch, SdkProvider } from "@cosmicdapp/logic";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";

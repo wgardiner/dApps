@@ -15,6 +15,6 @@ export const MainStack = styled(Stack)`
 
 export const ContractStack = styled(Stack)`
   & > * {
-    --gap: var(--s4);
+    --gap: var(--s2);
   }
 `;

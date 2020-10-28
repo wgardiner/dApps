@@ -12,7 +12,7 @@ export const MainStack = styled(Stack)`
 
 export const WelcomeStack = styled(Stack)`
   & > * {
-    --gap: var(--s3);
+    --gap: var(--s2);
   }
 `;
 

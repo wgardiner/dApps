@@ -1,7 +1,7 @@
 import { PageLayout, YourAccount } from "@cosmicdapp/design";
 import { useError, useSdk } from "@cosmicdapp/logic";
 import { Contract } from "@cosmjs/cosmwasm";
-import { Button, Typography } from "antd";
+import { Button, Typography, Card } from "antd";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { config } from "../../../config";
@@ -108,10 +108,13 @@ export function Home(): JSX.Element {
         <Title>Funding</Title>
         <ContractStack tag="nav">
           {contracts.map(({ label, address }) => (
-            <Link key={address} to={`${pathContract}/${label.toLowerCase()}/${address}`}>
-            {/* <Link key={address} to={`${pathContract}/${address}`}> */}
-              <Button type="primary">{label}</Button>
-            </Link>
+            <Card key={address}>
+
+              <Link to={`${pathContract}/${label.toLowerCase()}/${address}`}>
+              {/* <Link key={address} to={`${pathContract}/${address}`}> */}
+                <Button type="primary">{label}</Button>
+              </Link>
+            </Card>
           ))}
         </ContractStack>
         <ContractStack>
