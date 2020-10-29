@@ -20,9 +20,21 @@ const coralnet: AppConfig = {
 	// codeId: 5,
 	codeId: 139,
 };
+const heldernet: AppConfig = {
+  httpUrl: 'https://lcd.heldernet.cosmwasm.com',
+	feeToken: 'ucosm',
+	gasPrice: 0.01,
+	faucetUrl: 'https://faucet.heldernet.cosmwasm.com/credit',
+	faucetToken: 'COSM',
+	addressPrefix: 'cosmos',
+	// codeId: 5,
+	// codeId: 139,
+	codeId: 59,
+};
 
 // REACT_APP_LOCAL is set via `yarn start:local`
 const isLocal =
 	process.env.NODE_ENV !== 'production' && !!process.env.REACT_APP_LOCAL;
 
 export const config = isLocal ? local : coralnet;
+// export const config = isLocal ? local : heldernet;
