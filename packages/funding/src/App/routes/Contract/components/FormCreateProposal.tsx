@@ -33,15 +33,15 @@ const WideInputNumber = styled(InputNumber)`
 `;
 
 interface ContractParams {
-  readonly label: string;
-  readonly address: string;
-  readonly name?: string;
+	readonly label: string;
+	readonly address: string;
+	readonly name?: string;
 }
 
 export function FormCreateProposal({
 	onCreateProposal,
 }: FormCreateProposalProps): JSX.Element {
-  const { label, address, name } = useParams() as ContractParams;
+	const { label, address, name } = useParams() as ContractParams;
 
 	const { getClient } = useSdk();
 
@@ -147,7 +147,7 @@ export function FormCreateProposal({
 		// }
 
 		// try {
-    console.log('----------stuff for exec', address, handleMsg);
+		console.log('----------stuff for exec', address, handleMsg);
 
 		const res = await getClient().execute(
 			address,
@@ -216,8 +216,8 @@ export function FormCreateProposal({
 						try {
 							const res = await handleProposalCreate(params);
 							// console.log('res', res);
-              setModalIsVisible(false);
-              onCreateProposal();
+							setModalIsVisible(false);
+							onCreateProposal();
 						} catch (error) {
 							setFieldError('general', error.message);
 						}

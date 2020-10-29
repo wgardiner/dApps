@@ -1,7 +1,7 @@
 import { FormCreateProposal } from './components/FormCreateProposal';
 import { BackButton, Loading, PageLayout } from '@cosmicdapp/design';
 import { YourAccount } from '../../components/logic/YourAccount';
-import { Button, Typography, Input, Card } from 'antd';
+import { Button, Typography, Input, InputNumber, Card, notification, Space, Tag } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import backArrowIcon from '../../assets/backArrow.svg';
@@ -21,9 +21,9 @@ import {
 const { Title, Text } = Typography;
 
 interface ContractParams {
-  readonly label: string;
-  readonly address: string;
-  readonly name?: string;
+	readonly label: string;
+	readonly address: string;
+	readonly name?: string;
 }
 
 // For Reference
@@ -35,8 +35,6 @@ interface ContractParams {
 //   // By convention, smart queries must return a valid JSON document (see https://github.com/CosmWasm/cosmwasm/issues/144)
 //   return JSON.parse(fromUtf8(fromBase64(result.smart)));
 // },
-
-
 
 export function Contract(): JSX.Element {
 	const { label, address, name } = useParams() as ContractParams;
@@ -83,8 +81,11 @@ export function Contract(): JSX.Element {
 		getProposals();
 	}, [setError, address, getClient, name]);
 
-	const [votesInputState, setVotesInputState] = useState({});
-	const onVoteCreate = (id) => async (ev) => {
+	const [votesInputState, setVotesInputState] = useState<{
+		[key: number]: any;
+	}>({});
+	const [isLoading, setIsLoading] = useState<number | null>(null);
+	const onVoteCreate = (id: number) => async (ev) => {
 		// console.log(ev);
 		// console.log(ev.target.value);
 		const amount = votesInputState[id];
@@ -96,14 +97,29 @@ export function Contract(): JSX.Element {
 		console.log('create vote', id, amount);
 		// console.log(`execute('create_vote', { proposal: ${id}, amount: [{amount: ${amount}}]})`);
 		try {
+			setIsLoading(id);
 			const res = await getClient().execute(address, handleMsg, 'create vote', [
 				{ denom: 'ushell', amount: String(amount) },
 			]);
+
 			// getClient.execute()
 			console.log(res);
 			// getProposals();
+      const { [id]: _, ...rest } = votesInputState;
+      console.log('-------', id, _, rest, votesInputState);
+			setVotesInputState({ ...rest });
+			notification.success({
+				message: 'Donation sent!',
+				description: `Transaction ${res.transactionHash}`,
+			});
 		} catch (err) {
 			console.warn(err);
+			notification.error({
+				message: 'Donation failed to send!',
+				description: 'There was an error',
+			});
+		} finally {
+			setIsLoading(null);
 		}
 	};
 
@@ -117,9 +133,7 @@ export function Contract(): JSX.Element {
 	};
 
 	return (
-		(loading && (
-			<Loading loadingText={`Loading`} />
-		)) ||
+		(loading && <Loading loadingText={`Loading`} />) ||
 		(!loading && (
 			<PageLayout>
 				<MainStack>
@@ -133,20 +147,39 @@ export function Contract(): JSX.Element {
 						</SearchStack>
 
 						{proposals.map((proposal, i) => (
-							<Card key={proposal.id}>
-								<strong>{proposal.name}</strong>
-								<br />
-								{proposal.description}
-								<br />
-								id: {proposal.id}
-								<Input
-									placeholder="amount in ushell"
-									type="number"
-									onChange={onChangeVotesInputs(proposal.id)}
-								/>
-								<Button type="primary" onClick={onVoteCreate(proposal.id)}>
-									Vote / Donate
-								</Button>
+							<Card key={proposal.id} style={{ textAlign: 'left' }}>
+                <Typography.Paragraph style={{ display: 'flex', justifyContent: 'space-between'}}>
+                  <strong>{proposal.name}</strong>
+                  <div style={{ fontSize: '12px', fontWeight: 'lighter' }}>
+                    id: {proposal.id}
+                  </div>
+                </Typography.Paragraph>
+                <Typography.Paragraph>
+                  {proposal.description}
+                </Typography.Paragraph>
+                <Typography.Paragraph>
+                  Tags:&nbsp;
+                  {proposal.tags.split(',').map((t: string) => (<Tag>{t.trim()}</Tag>))}
+                </Typography.Paragraph>
+                <Space>
+                  <Input
+                    placeholder="amount in ushell"
+                    type="number"
+                    value={votesInputState[proposal.id]}
+                    onChange={onChangeVotesInputs(proposal.id)}
+                    disabled={isLoading === proposal.id}
+                    // formatter={value => `${value}%`}
+                    // parser={value => value.replace('%', '')}
+                  />
+                  <Button
+                    type="primary"
+                    onClick={onVoteCreate(proposal.id)}
+                    disabled={isLoading === proposal.id}
+                    loading={isLoading === proposal.id}
+                  >
+                    Donate
+                  </Button>
+                </Space>
 							</Card>
 							// <Link key={proposal.id} to={`${pathContract}/${label.toLowerCase()}/${address}/`}>
 							//   <Button type="primary">{proposal.name}</Button>
