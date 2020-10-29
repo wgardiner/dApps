@@ -1,12 +1,12 @@
 import { PageLayout, YourAccount } from "@cosmicdapp/design";
 import { useError, useSdk } from "@cosmicdapp/logic";
 import { Contract } from "@cosmjs/cosmwasm";
-import { Button, Typography, Card } from "antd";
+import { Button, Typography, Card, Modal, List } from "antd";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { config } from "../../../config";
 import { pathContract } from "../../paths";
-import { ContractStack, MainStack } from "./style";
+import { ContractStack, MainStack, ContractList, Caption, Heading, NormalLink } from "./style";
 
 const { Title } = Typography;
 
@@ -48,7 +48,7 @@ const { Title } = Typography;
 //     // pub voting_min_period: Option<u32>,
 //     pub proposal_period_start: Option<u64>,
 //     pub proposal_period_end: Option<u64>,
-//     pub voting_period_start: Option<u64>,
+//     pub voting_period_start: OptioWidthListn<u64>,
 //     pub voting_period_end: Option<u64>,
 //     // pub funding_formula: Option<String>,
 // }
@@ -106,22 +106,42 @@ export function Home(): JSX.Element {
     <PageLayout>
       <MainStack>
         <Title>Funding</Title>
-        <ContractStack tag="nav">
-          {contracts.map(({ label, address }) => (
-            <Card key={address}>
+        <Card>
+          <ContractStack tag="nav">
+            <ContractList>
 
-              <Link to={`${pathContract}/${label.toLowerCase()}/${address}`}>
-              {/* <Link key={address} to={`${pathContract}/${address}`}> */}
-                <Button type="primary">{label}</Button>
-              </Link>
-            </Card>
-          ))}
-        </ContractStack>
+              {contracts.map(({ label, address }) => (
+                  <List.Item
+                    // actions={[
+                    //   <Link to={`${pathContract}/${label.toLowerCase()}/${address}`}>
+                    //     {/* <Link key={address} to={`${pathContract}/${address}`}> */}
+                    //     <Button block={false}>
+                    //       View Proposals
+                    //     </Button>
+                    //   </Link>
+                    // ]}
+                  >
+                    <NormalLink to={`${pathContract}/${label.toLowerCase()}/${address}`}>
+                      <Heading>
+                        { label }
+                      </Heading>
+                      <Caption>
+                        { address }
+                      </Caption>
+                      {/* <List.Item.Meta title={label} description={address} /> */}
+
+                    </NormalLink>
+                  </List.Item>
+              ))}
+            </ContractList>
+          </ContractStack>
+        </Card>
         <ContractStack>
           <Button type="primary" onClick={onCreateInstantiation}>New Instantiation</Button>
         </ContractStack>
         <YourAccount tag="footer" />
       </MainStack>
+      {/* <Modal visible={true}>asdfasdf</Modal> */}
     </PageLayout>
   );
 }

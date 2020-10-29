@@ -1,4 +1,4 @@
-# name-service
+# funding
 
 ## Prerequisites
 
