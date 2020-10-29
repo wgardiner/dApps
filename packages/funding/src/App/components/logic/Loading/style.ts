@@ -1,8 +1,8 @@
-import { Spin } from "antd";
-import styled from "styled-components";
+import { Spin } from 'antd';
+import styled from 'styled-components';
 
 export const StyledSpin = styled(Spin)`
-  & > span + div {
-    margin-top: var(--s2);
-  }
+	& > span + div {
+		margin-top: var(--s2);
+	}
 `;

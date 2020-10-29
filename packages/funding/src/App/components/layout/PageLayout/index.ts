@@ -1,1 +1,1 @@
-export { StyledPageLayout as PageLayout } from "./style";
+export { StyledPageLayout as PageLayout } from './style';

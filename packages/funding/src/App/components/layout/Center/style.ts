@@ -1,17 +1,17 @@
-import styled from "styled-components";
-import { Center } from "./component";
+import styled from 'styled-components';
+import { Center } from './component';
 
 export const StyledCenter = styled(Center)`
-  box-sizing: content-box;
+	box-sizing: content-box;
 
-  max-width: var(--max-width, none);
+	max-width: var(--max-width, none);
 
-  margin-left: auto;
-  margin-right: auto;
+	margin-left: auto;
+	margin-right: auto;
 
-  text-align: center;
+	text-align: center;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 `;
