@@ -11,8 +11,8 @@
 	"scripts": {
 		"start": "craco start",
 		"build": "craco build",
-    "test": "craco test",
-    "format": "prettier --config ./.prettier.config.js  . --write"
+		"test": "craco test",
+		"format": "prettier --config ./.prettier.config.js  . --write"
 	},
 	"dependencies": {
 		"@cosmicdapp/design": "^0.3.0",

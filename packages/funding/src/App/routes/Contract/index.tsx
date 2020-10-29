@@ -1,9 +1,6 @@
-import {
-	BackButton,
-	Loading,
-	PageLayout,
-	YourAccount,
-} from '@cosmicdapp/design';
+import { FormCreateProposal } from './components/FormCreateProposal';
+import { BackButton, Loading, PageLayout } from '@cosmicdapp/design';
+import { YourAccount } from '../../components/logic/YourAccount';
 import { Button, Typography, Input, Card } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
@@ -24,9 +21,9 @@ import {
 const { Title, Text } = Typography;
 
 interface ContractParams {
-	readonly label: string;
-	readonly address: string;
-	readonly name?: string;
+  readonly label: string;
+  readonly address: string;
+  readonly name?: string;
 }
 
 // For Reference
@@ -39,15 +36,17 @@ interface ContractParams {
 //   return JSON.parse(fromUtf8(fromBase64(result.smart)));
 // },
 
+
+
 export function Contract(): JSX.Element {
 	const { label, address, name } = useParams() as ContractParams;
 
 	const [loading, setLoading] = useState(false);
-	const [searchedName, setSearchedName] = useState(name);
+	// const [searchedName, setSearchedName] = useState(name);
 
-	function setLowercaseSearchedName(newName: string) {
-		setSearchedName(newName.toLowerCase());
-	}
+	// function setLowercaseSearchedName(newName: string) {
+	// 	setSearchedName(newName.toLowerCase());
+	// }
 
 	interface Proposal {
 		readonly [key: string]: any;
@@ -76,10 +75,10 @@ export function Contract(): JSX.Element {
 	}
 
 	useEffect(() => {
-		console.log('useeffect');
+		// console.log('useeffect');
 		// console.log(address);
-		(window as any).getClient = getClient;
-		(window as any).address = address;
+		// (window as any).getClient = getClient;
+		// (window as any).address = address;
 		// console.log(label, name, address);
 		getProposals();
 	}, [setError, address, getClient, name]);
@@ -117,41 +116,9 @@ export function Contract(): JSX.Element {
 		});
 	};
 
-	async function onProposalCreate() {
-		const rand = Math.floor(Math.random() * 1e6);
-		const handleMsg = {
-			create_proposal: {
-				name: `Proposal ${rand}`,
-				recipient: 'coral1ndn0wv022sc3zkkzuyk76f2en6sftghvezs0hc',
-				description: `Description for Proposal ${rand}`,
-				tags: `space kittens, plants`,
-			},
-		};
-		// pub struct CreateProposal {
-		// pub name: String,
-		// pub recipient: HumanAddr,
-		// pub description: String,
-		// pub tags: String,
-		// }
-
-		try {
-			const res = await getClient().execute(
-				address,
-				handleMsg,
-				'create proposal',
-				[{ denom: 'ushell', amount: '1000' }]
-			);
-			// getClient.execute()
-			console.log(res);
-			getProposals();
-		} catch (err) {
-			console.warn(err);
-		}
-	}
-
 	return (
 		(loading && (
-			<Loading loadingText={`Registering name: ${searchedName}...`} />
+			<Loading loadingText={`Loading`} />
 		)) ||
 		(!loading && (
 			<PageLayout>
@@ -185,9 +152,7 @@ export function Contract(): JSX.Element {
 							//   <Button type="primary">{proposal.name}</Button>
 							// </Link>
 						))}
-						<Button type="primary" onClick={onProposalCreate}>
-							New Proposal
-						</Button>
+						<FormCreateProposal onCreateProposal={getProposals} />
 						{/* {searchedName && (
               <SearchResult
                 contractLabel={label}

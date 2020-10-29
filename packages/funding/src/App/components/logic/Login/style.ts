@@ -6,7 +6,7 @@ const { Text } = Typography;
 
 export const MainStack = styled(Stack)`
 	& > * {
-		--gap: var(--s9);
+		--gap: var(--s6);
 	}
 `;
 

@@ -1,9 +1,10 @@
-import { Stack } from '@cosmicdapp/design';
+import { Stack } from '../../components/layout/Stack';
 import { List, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 export const MainStack = styled(Stack)`
+	--gap: var(--s4);
 	h1 {
 		margin: 0;
 		text-transform: capitalize;
@@ -16,14 +17,20 @@ export const MainStack = styled(Stack)`
 `;
 
 export const ContractStack = styled(Stack)`
-	& > * {
-		--gap: var(--s2);
+	li + li {
+		/* --gap: var(--s1); */
+		margin-top: var(--s0);
+		/* margin-bottom: var(--s1); */
 	}
 `;
 
 export const ContractList = styled(List)`
-	width: var(--max-width);
+	/* max-width: var(--max-width); */
 	text-align: left;
+
+	& > * {
+		--gap: var(--s1);
+	}
 
 	.ant-list-item-meta-description {
 		font-size: 12px;

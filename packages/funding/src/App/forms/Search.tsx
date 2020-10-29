@@ -22,9 +22,9 @@ interface InputType
 	extends React.ForwardRefExoticComponent<
 		FormikFieldProps & BaseInputProps & React.RefAttributes<BaseInput>
 	> {
-    Search: React.ForwardRefExoticComponent<
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
+	Search: React.ForwardRefExoticComponent<
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
 		FormikFieldProps & BaseSearchProps & React.RefAttributes<Search>
 	>;
 }
