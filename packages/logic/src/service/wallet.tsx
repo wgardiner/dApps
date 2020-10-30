@@ -51,11 +51,17 @@ export function SdkProvider({ config, children }: SdkProviderProps): JSX.Element
     if (config.faucetUrl) {
       const acct = await client.getAccount();
       if (!acct?.balance?.length) {
-        await fetch(config.faucetUrl, {
+        const res = await fetch(config.faucetUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ticker: config.faucetToken, address }),
+          body: JSON.stringify({
+            // ticker: config.faucetToken, address
+            denom: config.faucetToken,
+            address
+          }),
         });
+        // const text = await res.text();
+        // console.log('hit faucet response', res, text);
       }
     }
 

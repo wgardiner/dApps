@@ -103,7 +103,7 @@ export function Login({
 		if (sdk.initialized) {
 			refreshAccount();
 		}
-	}, [sdk.initialized, refreshAccount]);
+	}, [sdk.initialized, refreshAccount, mnemonic]);
 
 	useEffect(() => {
 		if (account) {
@@ -113,7 +113,7 @@ export function Login({
 				history.push(pathAfterLogin);
 			}
 		}
-	}, [account, state, history]);
+	}, [account, mnemonic, state, history]);
 
 	return initializing ? (
 		<Loading loadingText="Initializing app..." />
