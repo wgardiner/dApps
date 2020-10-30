@@ -78,9 +78,14 @@ export function FormCreateProposal({ onCreateProposal }: FormCreateProposalProps
     // try {
     console.log("----------stuff for exec", address, handleMsg);
 
-    const res = await getClient().execute(address, handleMsg, "create proposal", [
-      { denom: "ucosm", amount: "1000" },
-    ]);
+    const res = await getClient().execute(
+      address,
+      handleMsg,
+      "create proposal",
+      // [
+      //   { denom: "ucosm", amount: "1000" },
+      // ]
+    );
     // getClient.execute()
     console.log(res);
     // getProposals();

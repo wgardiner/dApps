@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { printableBalance, useAccount } from "@cosmicdapp/logic";
 import { Modal, Button, Descriptions } from "antd";
 import { useError, useSdk } from "@cosmicdapp/logic";
+import { config } from "../../../config";
 
 // import Search from '../../../forms/Search';
 // import { SearchValidationSchema } from '../../../forms/validationSchemas';
@@ -85,10 +86,11 @@ export function FormNewInstantiation({
       memo: "memo",
       transferAmount: [{ denom: budgetDenom, amount: String(budgetAmount) }],
     };
+    console.log("initMsg", initMsg);
     // TODO: make this into a form
     // TODO: show spinner while loading
     // try {
-    const res = await getClient().instantiate(139, initMsg, projectName, initOptions);
+    const res = await getClient().instantiate(config.codeId, initMsg, projectName, initOptions);
     // TODO: show success message
     // setContracts([...contracts, ])
     // getInstantiationsList();

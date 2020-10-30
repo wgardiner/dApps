@@ -29,7 +29,7 @@ const heldernet: AppConfig = {
   addressPrefix: "cosmos",
   // codeId: 5,
   // codeId: 139,
-  codeId: 51,
+  codeId: 68,
 };
 
 // REACT_APP_LOCAL is set via `yarn start:local`
