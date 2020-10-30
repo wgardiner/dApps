@@ -23,7 +23,7 @@ const coralnet: AppConfig = {
 const heldernet: AppConfig = {
   httpUrl: "https://lcd.heldernet.cosmwasm.com",
   feeToken: "ucosm",
-  gasPrice: 0.025,
+  gasPrice: 0.01,
   faucetUrl: "https://faucet.heldernet.cosmwasm.com/credit",
   faucetToken: "ucosm",
   addressPrefix: "cosmos",

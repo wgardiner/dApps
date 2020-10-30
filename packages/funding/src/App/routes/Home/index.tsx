@@ -1,22 +1,15 @@
 // import { PageLayout } from '@cosmicdapp/design';
-import { PageLayout } from '../../components/layout/PageLayout';
-import { YourAccount } from '../../components/logic/YourAccount';
-import { FormNewInstantiation } from './FormNewInstantiation';
-import { useError, useSdk } from '@cosmicdapp/logic';
-import { Contract } from '@cosmjs/cosmwasm';
-import { Button, Typography, Card, Modal, List } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { config } from '../../../config';
-import { pathContract } from '../../paths';
-import {
-	ContractStack,
-	MainStack,
-	ContractList,
-	Caption,
-	Heading,
-	NormalLink,
-} from './style';
+import { PageLayout } from "../../components/layout/PageLayout";
+import { YourAccount } from "../../components/logic/YourAccount";
+import { FormNewInstantiation } from "./FormNewInstantiation";
+import { useError, useSdk } from "@cosmicdapp/logic";
+import { Contract } from "@cosmjs/cosmwasm";
+import { Button, Typography, Card, Modal, List } from "antd";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { config } from "../../../config";
+import { pathContract } from "../../paths";
+import { ContractStack, MainStack, ContractList, Caption, Heading, NormalLink } from "./style";
 
 const { Title } = Typography;
 
@@ -64,59 +57,59 @@ const { Title } = Typography;
 // }
 
 export function Home(): JSX.Element {
-	const { setError } = useError();
-	const { getClient } = useSdk();
+  const { setError } = useError();
+  const { getClient } = useSdk();
 
-	const [contracts, setContracts] = useState<readonly Contract[]>([]);
+  const [contracts, setContracts] = useState<readonly Contract[]>([]);
 
-	async function getInstantiationsList() {
-		getClient()
-			.getContracts(config.codeId)
-			.then((contracts) => setContracts(contracts))
-			.catch(setError);
-	}
+  async function getInstantiationsList() {
+    getClient()
+      .getContracts(config.codeId)
+      .then((contracts) => setContracts(contracts))
+      .catch(setError);
+  }
 
-	useEffect(() => {
-		getInstantiationsList();
-	}, [getClient, setError]);
+  useEffect(() => {
+    getInstantiationsList();
+  }, [getClient, setError]);
 
-	return (
-		<PageLayout>
-			<MainStack>
-				<Title>Projects</Title>
-				<Card>
-					<ContractStack tag="nav">
-						<ContractList>
-							{contracts.map(({ label, address }) => (
-								<List.Item
-									key={address}
-									// actions={[
-									//   <Link to={`${pathContract}/${label.toLowerCase()}/${address}`}>
-									//     {/* <Link key={address} to={`${pathContract}/${address}`}> */}
-									//     <Button block={false}>
-									//       View Proposals
-									//     </Button>
-									//   </Link>
-									// ]}
-								>
-									<NormalLink
-										to={`${pathContract}/${label.toLowerCase()}/${address}`}
-									>
-										<Heading>{label}</Heading>
-										<Caption>{address}</Caption>
-										{/* <List.Item.Meta title={label} description={address} /> */}
-									</NormalLink>
-								</List.Item>
-							))}
-						</ContractList>
-						<FormNewInstantiation
-							onCreateInstantiation={getInstantiationsList}
-						/>
-					</ContractStack>
-				</Card>
-				<ContractStack></ContractStack>
-				<YourAccount tag="footer" />
-			</MainStack>
-		</PageLayout>
-	);
+  return (
+    <PageLayout>
+      <MainStack>
+        <Title>Projects</Title>
+        <Card>
+          <ContractStack tag="nav">
+            <ContractList>
+              {!contracts.length ? (
+                <Typography.Paragraph>No projects yet...</Typography.Paragraph>
+              ) : (
+                contracts.map(({ label, address }) => (
+                  <List.Item
+                    key={address}
+                    // actions={[
+                    //   <Link to={`${pathContract}/${label.toLowerCase()}/${address}`}>
+                    //     {/* <Link key={address} to={`${pathContract}/${address}`}> */}
+                    //     <Button block={false}>
+                    //       View Proposals
+                    //     </Button>
+                    //   </Link>
+                    // ]}
+                  >
+                    <NormalLink to={`${pathContract}/${label.toLowerCase()}/${address}`}>
+                      <Heading>{label}</Heading>
+                      <Caption>{address}</Caption>
+                      {/* <List.Item.Meta title={label} description={address} /> */}
+                    </NormalLink>
+                  </List.Item>
+                ))
+              )}
+            </ContractList>
+            <FormNewInstantiation onCreateInstantiation={getInstantiationsList} />
+          </ContractStack>
+        </Card>
+        <ContractStack></ContractStack>
+        <YourAccount tag="footer" />
+      </MainStack>
+    </PageLayout>
+  );
 }
