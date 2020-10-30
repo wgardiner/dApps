@@ -144,6 +144,7 @@ export function FormCreateProposal({ onCreateProposal }: FormCreateProposalProps
               setModalIsVisible(false);
               onCreateProposal();
             } catch (error) {
+              console.warn(error);
               setFieldError("general", error.message);
             }
             setSubmitting(false);
