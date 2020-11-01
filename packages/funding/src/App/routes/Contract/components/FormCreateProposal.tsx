@@ -68,12 +68,6 @@ export function FormCreateProposal({ onCreateProposal }: FormCreateProposalProps
         tags,
       },
     };
-    // pub struct CreateProposal {
-    // pub name: String,
-    // pub recipient: HumanAddr,
-    // pub description: String,
-    // pub tags: String,
-    // }
 
     // try {
     console.log("----------stuff for exec", address, handleMsg);
@@ -128,9 +122,12 @@ export function FormCreateProposal({ onCreateProposal }: FormCreateProposalProps
             if (values.description.length < 5) {
               errors.description = "Description required";
             }
+            if (values.tags.length < 5) {
+              errors.tags = "Tags required";
+            }
             return errors;
           }}
-          onSubmit={async (values, { setSubmitting, setFieldError }) => {
+          onSubmit={async (values, { setSubmitting, setFieldError, resetForm }) => {
             // setSearchedName(values.name);
             const { name, recipient, tags, description } = values;
             console.log("create proposal", values);
@@ -153,6 +150,7 @@ export function FormCreateProposal({ onCreateProposal }: FormCreateProposalProps
               setFieldError("general", error.message);
             }
             setSubmitting(false);
+            resetForm();
           }}
         >
           {(formikProps) => (

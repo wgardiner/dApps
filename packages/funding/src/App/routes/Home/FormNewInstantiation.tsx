@@ -155,13 +155,14 @@ export function FormNewInstantiation({
             try {
               const res = await handleCreateInstantiation(params);
               console.log("res", res);
-              resetForm();
               setModalIsVisible(false);
             } catch (error) {
               console.warn(error);
               setFieldError("general", error.message);
             }
             setSubmitting(false);
+            resetForm();
+
             // onCreateInstantiation({
             //   ...values,
             //   voterWhitelist: values.voterWhitelist.split(','),

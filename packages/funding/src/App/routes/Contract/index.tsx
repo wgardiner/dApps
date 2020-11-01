@@ -69,6 +69,8 @@ export function Contract(): JSX.Element {
       });
   }
 
+  (window as any).client = getClient();
+
   useEffect(() => {
     // console.log('useeffect');
     // console.log(address);
@@ -129,6 +131,73 @@ export function Contract(): JSX.Element {
     });
   };
 
+  async function handleCheckDistributions() {
+    try {
+      const client = getClient();
+      // //@ts-ignore
+      // client.fees.exec = {
+      //   gas: "50000",
+      //   amount: [
+      //     {
+      //       amount: "500",
+      //       denom: "ucosm",
+      //     },
+      //   ],
+      // };
+      const res = await client.execute(
+        address,
+        { check_distributions: {} },
+        "check distributions",
+        // [{ amount: "50000", denom: "ucosm" }],
+      );
+      console.log(res);
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+  async function handleDistributeFunds() {
+    try {
+      const client = getClient();
+      // //@ts-ignore
+      // client.fees.exec = {
+      //   gas: "50000",
+      //   amount: [
+      //     {
+      //       amount: "500",
+      //       denom: "ucosm",
+      //     },
+      //   ],
+      // };
+      const res = await client.execute(
+        address,
+        { distribute_funds: {} },
+        "distribute funds",
+        // [{ amount: "50000", denom: "ucosm" }],
+      );
+      console.log(res);
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  async function handleGetContractState() {
+    try {
+      const res = await getClient().queryContractSmart(address, { get_state: {} });
+      console.log(res);
+    } catch (err) {
+      console.warn(err);
+    }
+
+    proposals.forEach(async (p) => {
+      try {
+        const res = await getClient().queryContractSmart(address, { proposal_state: { proposal_id: p.id } });
+        console.log(res);
+      } catch (err) {
+        console.warn(err);
+      }
+    });
+  }
+
   return (
     (loading && <Loading loadingText={`Loading`} />) ||
     (!loading && (
@@ -152,8 +221,8 @@ export function Contract(): JSX.Element {
                 <Typography.Paragraph>{proposal.description}</Typography.Paragraph>
                 <Typography.Paragraph>
                   Tags:&nbsp;
-                  {proposal.tags.split(",").map((t: string) => (
-                    <Tag>{t.trim()}</Tag>
+                  {proposal.tags.split(",").map((t: string, i: number) => (
+                    <Tag key={i}>{t.trim()}</Tag>
                   ))}
                 </Typography.Paragraph>
                 <Space>
@@ -189,6 +258,15 @@ export function Contract(): JSX.Element {
                 setLoading={setLoading}
               />
             )} */}
+            <Button type="primary" onClick={handleCheckDistributions}>
+              Check Distributions
+            </Button>
+            <Button type="primary" onClick={handleDistributeFunds}>
+              Distribute Funds
+            </Button>
+            <Button type="primary" onClick={handleGetContractState}>
+              Get Contract State
+            </Button>
           </BackSearchResultStack>
           <YourAccount tag="footer" />
         </MainStack>

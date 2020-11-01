@@ -27,9 +27,8 @@ const heldernet: AppConfig = {
   faucetUrl: "https://faucet.heldernet.cosmwasm.com/credit",
   faucetToken: "ucosm",
   addressPrefix: "cosmos",
-  // codeId: 5,
-  // codeId: 139,
-  codeId: 68,
+  // codeId: 68,
+  codeId: 83,
 };
 
 // REACT_APP_LOCAL is set via `yarn start:local`
