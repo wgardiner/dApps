@@ -40,7 +40,7 @@ export function FormNewInstantiation({
     address: "",
     balance: [],
   };
-  console.log(balance);
+  // console.log(balance);
 
   const [modalIsVisible, setModalIsVisible] = useState(false);
 
@@ -125,7 +125,7 @@ export function FormNewInstantiation({
             if (balance && values.budgetAmount > balance[0].amount) {
               errors.budgetAmount = "Funding pool amount exceeds account balance";
             }
-            console.log(balance[0]);
+            // console.log(balance[0]);
             if (values.budgetAmount < 100) {
               errors.budgetAmount = "Funding pool amount is too low";
             }

@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 // import { SearchResult } from "./components/SearchResult";
 import { BackSearchResultStack, MainStack, SearchStack } from "./style";
 import { pathContract } from "../../paths";
+import { Coin } from "@cosmjs/launchpad";
 
 import { /*getErrorFromStackTrace, printableCoin, useAccount,*/ useError, useSdk } from "@cosmicdapp/logic";
 // import { string } from "yup";
@@ -44,29 +45,120 @@ export function Contract(): JSX.Element {
   // }
 
   interface Proposal {
-    readonly [key: string]: any;
+    // readonly [key: string]: any;
+    readonly id: number;
+    readonly description: string;
+    readonly name: string;
+    readonly recipient: string;
+    readonly tags: string;
   }
+
+  interface Vote {
+    readonly voter: string;
+    proposal: number;
+    amount: Coin[];
+  }
+  interface ProposalState {
+    proposal: Proposal;
+    votes: Vote[];
+  }
+
+  interface InstantiationState {
+    name: string;
+    proposal_period_end: number;
+    proposal_period_start: number;
+    voting_period_end: number;
+    voting_period_start: number;
+    proposer_whitelist: string[];
+    voter_whitelist: string[];
+  }
+
   const [proposals, setProposals] = useState<readonly Proposal[]>([]);
+  const [instantiationState, setInstantiationState] = useState<InstantiationState>({
+    name: undefined,
+    proposal_period_end: undefined,
+    proposal_period_start: undefined,
+    voting_period_end: undefined,
+    voting_period_start: undefined,
+    proposer_whitelist: [],
+    voter_whitelist: [],
+  });
+  // const [proposalsState, setProposalsState] = useState({});
+  const [proposalsState, setProposalsState] = useState<ProposalState[]>([]);
+  const [votingPeriodIsValid, setVotingPeriodIsValid] = useState(false);
+  const [proposalPeriodIsValid, setProposalPeriodIsValid] = useState(false);
+
   const { setError, error } = useError();
   const { getClient } = useSdk();
 
-  function getProposals() {
-    getClient()
-      // .queryContractSmart(address, { resolve_record: { name } })
-      // one of`get_state`, `proposal_list`, `proposal_state`
-      .queryContractSmart(address, { proposal_list: {} })
-      .then((response) => {
-        // setNameOwnerAddress(response.address);
-        console.log(response);
-        setProposals(response.proposals);
-      })
-      .catch((error) => {
-        // // a not found error means it is free, other errors need to be reported
-        // if (!error.toString().includes("NameRecord not found")) {
-        //   setError(error);
-        // }
-        console.warn(error);
-      });
+  async function getProposalList(): Promise<Proposal[]> {
+    console.log("getProposalList");
+    try {
+      const res = await getClient().queryContractSmart(address, { proposal_list: {} });
+      console.log(res);
+      setProposals(res.proposals);
+      return res.proposals;
+    } catch (err) {
+      console.warn(error);
+    }
+    return [];
+  }
+
+  async function getInstantiationState() {
+    try {
+      const res = await getClient()
+        // .queryContractSmart(address, { resolve_record: { name } })
+        // one of`get_state`, `proposal_list`, `proposal_state`
+        .queryContractSmart(address, { get_state: {} });
+      console.log("instantiation state", res);
+      setInstantiationState(res);
+      const now = Math.floor(Date.now() / 1e3);
+      res.voting_period_start < now && res.voting_period_end > now && setVotingPeriodIsValid(true);
+      res.proposal_period_start < now && res.proposal_period_end > now && setProposalPeriodIsValid(true);
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  async function getProposalsState(ids?: number[]) {
+    console.log("getProposalsState", ids, proposals);
+    try {
+      const propsState = Promise.all(
+        // (ids || proposals.map((p) => p.id)).map((id) => {
+        ids.map((id) => {
+          return getClient().queryContractSmart(address, { proposal_state: { proposal_id: id } });
+        }),
+      );
+      const res = await propsState;
+      console.log("getProposalsState", res);
+      // setProposalsState(res.reduce((r, x) => ({ ...r, [x.id]: { ...x } }), {}));
+      setProposalsState(res);
+      // setProposalsState({
+      //   ...proposalsState,
+      //   [id]: res,
+      // });
+    } catch (err) {
+      console.warn(err);
+    }
+    // (ids || proposals.map((p) => p.id)).forEach(async (id) => {
+    //   try {
+    //     const res = await getClient().queryContractSmart(address, { proposal_state: { proposal_id: id } });
+    //     console.log(res);
+    //     setProposalsState({
+    //       ...proposalsState,
+    //       [id]: res,
+    //     });
+    //   } catch (err) {
+    //     console.warn(err);
+    //   }
+    // });
+  }
+
+  async function getResources() {
+    getInstantiationState();
+    const proposalsList = await getProposalList();
+    console.log("prop list", proposalsList);
+    getProposalsState(proposalsList.map((p) => p.id));
   }
 
   (window as any).client = getClient();
@@ -77,7 +169,7 @@ export function Contract(): JSX.Element {
     // (window as any).getClient = getClient;
     // (window as any).address = address;
     // console.log(label, name, address);
-    getProposals();
+    getResources();
   }, [setError, address, getClient, name]);
 
   const [votesInputState, setVotesInputState] = useState<{
@@ -103,7 +195,7 @@ export function Contract(): JSX.Element {
 
       // getClient.execute()
       console.log(res);
-      // getProposals();
+      // getResources();
       const { [id]: _, ...rest } = votesInputState;
       console.log("-------", id, _, rest, votesInputState);
       setVotesInputState({ ...rest });
@@ -151,6 +243,7 @@ export function Contract(): JSX.Element {
         // [{ amount: "50000", denom: "ucosm" }],
       );
       console.log(res);
+      console.log(JSON.parse(atob(res.logs[0].events[1].attributes[1].value)));
     } catch (err) {
       console.warn(err);
     }
@@ -209,10 +302,24 @@ export function Contract(): JSX.Element {
               {/* <Title>{label}</Title> */}
               <Title>{label}</Title>
               <Text>({address})</Text>
+              <Text>
+                Proposal period
+                <br />
+                {new Date(instantiationState.proposal_period_start * 1e3).toLocaleString()}
+                &nbsp;&mdash;&nbsp;
+                {new Date(instantiationState.proposal_period_end * 1e3).toLocaleString()}
+              </Text>
+              <Text>
+                Voting period <br />
+                {new Date(instantiationState.voting_period_start * 1e3).toLocaleString()}
+                &nbsp;&mdash;&nbsp;
+                {new Date(instantiationState.voting_period_end * 1e3).toLocaleString()}
+              </Text>
               {/* <FormSearchName initialName={name} setSearchedName={setLowercaseSearchedName} /> */}
             </SearchStack>
 
-            {proposals.map((proposal, i) => (
+            {/* {proposals?.map((proposal, i) => ( */}
+            {proposalsState?.map(({ proposal, votes }, i) => (
               <Card key={proposal.id} style={{ textAlign: "left" }}>
                 <Typography.Paragraph style={{ display: "flex", justifyContent: "space-between" }}>
                   <strong>{proposal.name}</strong>
@@ -225,20 +332,30 @@ export function Contract(): JSX.Element {
                     <Tag key={i}>{t.trim()}</Tag>
                   ))}
                 </Typography.Paragraph>
+                {/* <Typography.Paragraph>
+                  Total Votes:
+                  {votes.reduce((r, x) => r + Number(x.amount[0].amount), 0)}
+                </Typography.Paragraph> */}
+                <Typography.Paragraph>
+                  Votes:&nbsp;
+                  {votes.map((v, i) => (
+                    <Tag key={i}>{v.amount[0].amount}</Tag>
+                  ))}
+                </Typography.Paragraph>
                 <Space>
                   <Input
                     placeholder="amount in ushell"
                     type="number"
                     value={votesInputState[proposal.id]}
                     onChange={onChangeVotesInputs(proposal.id)}
-                    disabled={isLoading === proposal.id}
+                    disabled={isLoading === proposal.id || !votingPeriodIsValid}
                     // formatter={value => `${value}%`}
                     // parser={value => value.replace('%', '')}
                   />
                   <Button
                     type="primary"
                     onClick={onVoteCreate(proposal.id)}
-                    disabled={isLoading === proposal.id}
+                    disabled={isLoading === proposal.id || !votingPeriodIsValid}
                     loading={isLoading === proposal.id}
                   >
                     Donate
@@ -249,7 +366,7 @@ export function Contract(): JSX.Element {
               //   <Button type="primary">{proposal.name}</Button>
               // </Link>
             ))}
-            <FormCreateProposal onCreateProposal={getProposals} />
+            <FormCreateProposal onCreateProposal={getResources} periodIsValid={proposalPeriodIsValid} />
             {/* {searchedName && (
               <SearchResult
                 contractLabel={label}

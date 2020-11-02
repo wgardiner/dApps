@@ -16,6 +16,7 @@ import { useError, useSdk } from "@cosmicdapp/logic";
 //   readonly setSearchedName: (value: React.SetStateAction<string>) => void;
 // }
 interface FormCreateProposalProps {
+  readonly periodIsValid: boolean;
   readonly onCreateProposal: () => void;
 }
 
@@ -31,7 +32,10 @@ interface ContractParams {
   readonly name?: string;
 }
 
-export function FormCreateProposal({ onCreateProposal }: FormCreateProposalProps): JSX.Element {
+export function FormCreateProposal({
+  onCreateProposal,
+  periodIsValid,
+}: FormCreateProposalProps): JSX.Element {
   const { label, address, name } = useParams() as ContractParams;
 
   const { getClient } = useSdk();
@@ -41,7 +45,7 @@ export function FormCreateProposal({ onCreateProposal }: FormCreateProposalProps
     address: "",
     balance: [],
   };
-  console.log(balance);
+  // console.log(balance);
 
   const [modalIsVisible, setModalIsVisible] = useState(false);
   async function handleProposalCreate({
@@ -91,7 +95,7 @@ export function FormCreateProposal({ onCreateProposal }: FormCreateProposalProps
 
   return (
     <>
-      <Button type="primary" onClick={() => setModalIsVisible(true)}>
+      <Button type="primary" onClick={() => setModalIsVisible(true)} disabled={!periodIsValid}>
         New Proposal
       </Button>
 
@@ -115,7 +119,7 @@ export function FormCreateProposal({ onCreateProposal }: FormCreateProposalProps
             if (balance && values.budgetAmount > balance[0].amount) {
               errors.budgetAmount = "Funding pool amount exceeds account balance";
             }
-            console.log(balance[0]);
+            // console.log(balance[0]);
             if (values.budgetAmount < 100) {
               errors.budgetAmount = "Funding pool amount is too low";
             }
