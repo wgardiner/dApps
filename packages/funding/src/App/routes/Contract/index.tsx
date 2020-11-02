@@ -1,7 +1,7 @@
 import { FormCreateProposal } from "./components/FormCreateProposal";
 import { BackButton, Loading, PageLayout } from "@cosmicdapp/design";
 import { YourAccount } from "../../components/logic/YourAccount";
-import { Button, Typography, Input, InputNumber, Card, notification, Space, Tag } from "antd";
+import { Button, Typography, Input, InputNumber, Card, notification, Space, Tag, Modal } from "antd";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import backArrowIcon from "../../assets/backArrow.svg";
@@ -73,6 +73,16 @@ export function Contract(): JSX.Element {
     voter_whitelist: string[];
   }
 
+  interface Distribution {
+    distribution_actual: Coin;
+    distribution_ideal: Coin;
+    proposal: number;
+    recipient: string;
+    subsidy_actual: Coin;
+    subsidy_ideal: Coin;
+    votes: Coin[];
+  }
+
   const [proposals, setProposals] = useState<readonly Proposal[]>([]);
   const [instantiationState, setInstantiationState] = useState<InstantiationState>({
     name: undefined,
@@ -87,6 +97,8 @@ export function Contract(): JSX.Element {
   const [proposalsState, setProposalsState] = useState<ProposalState[]>([]);
   const [votingPeriodIsValid, setVotingPeriodIsValid] = useState(false);
   const [proposalPeriodIsValid, setProposalPeriodIsValid] = useState(false);
+  const [distributionsCheck, setDistributionsCheck] = useState<Distribution[]>([]);
+  const [distCheckModalIsVisible, setDistCheckModalIsVisible] = useState(false);
 
   const { setError, error } = useError();
   const { getClient } = useSdk();
@@ -243,7 +255,10 @@ export function Contract(): JSX.Element {
         // [{ amount: "50000", denom: "ucosm" }],
       );
       console.log(res);
-      console.log(JSON.parse(atob(res.logs[0].events[1].attributes[1].value)));
+      const resData = JSON.parse(atob(res.logs[0].events[1].attributes[1].value));
+      console.log("distributions check data", resData);
+      setDistributionsCheck(resData.distributions);
+      setDistCheckModalIsVisible(true);
     } catch (err) {
       console.warn(err);
     }
@@ -386,6 +401,46 @@ export function Contract(): JSX.Element {
             </Button>
           </BackSearchResultStack>
           <YourAccount tag="footer" />
+          <Modal
+            onOk={() => setDistCheckModalIsVisible(false)}
+            onCancel={() => setDistCheckModalIsVisible(false)}
+            visible={distCheckModalIsVisible}
+          >
+            {distributionsCheck?.map((d, i) => {
+              return (
+                <p style={{ marginTop: "1em" }} key={i}>
+                  <div>
+                    <strong>Proposal: {d.proposal}</strong>
+                  </div>
+                  <div>
+                    Ideal distribution: {d.distribution_ideal.amount}
+                    {d.distribution_ideal.denom}
+                  </div>
+                  <div>
+                    Actual distribution: {d.distribution_actual.amount}
+                    {d.distribution_actual.denom}
+                  </div>
+                  <div>
+                    Ideal subsidy: {d.subsidy_ideal.amount}
+                    {d.subsidy_ideal.denom}
+                  </div>
+                  <div>
+                    Actual subsidy: {d.subsidy_actual.amount}
+                    {d.subsidy_actual.denom}
+                  </div>
+                  <div>
+                    Votes:{" "}
+                    {d.votes.map((v, i) => (
+                      <Tag key={i}>
+                        {v.amount}
+                        {v.denom}
+                      </Tag>
+                    ))}
+                  </div>
+                </p>
+              );
+            })}
+          </Modal>
         </MainStack>
       </PageLayout>
     ))
