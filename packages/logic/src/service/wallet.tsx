@@ -51,7 +51,7 @@ export function SdkProvider({ config, children }: SdkProviderProps): JSX.Element
     if (config.faucetUrl) {
       const acct = await client.getAccount();
       if (!acct?.balance?.length) {
-        const res = await fetch(config.faucetUrl, {
+        await fetch(config.faucetUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
