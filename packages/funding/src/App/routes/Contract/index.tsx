@@ -118,6 +118,7 @@ export function Contract(): JSX.Element {
 
   async function getInstantiationState() {
     try {
+      console.log("contract address", address);
       const res = await getClient()
         // .queryContractSmart(address, { resolve_record: { name } })
         // one of`get_state`, `proposal_list`, `proposal_state`
@@ -125,8 +126,16 @@ export function Contract(): JSX.Element {
       console.log("instantiation state", res);
       setInstantiationState(res);
       const now = Math.floor(Date.now() / 1e3);
-      res.voting_period_start < now && res.voting_period_end > now && setVotingPeriodIsValid(true);
-      res.proposal_period_start < now && res.proposal_period_end > now && setProposalPeriodIsValid(true);
+
+      // Check if proposal period has started.
+      const proposal_started = !!res.proposal_period_start && res.proposal_period_start < now;
+      const proposal_ended = !!res.proposal_period_end && res.proposal_period_end < now;
+      setProposalPeriodIsValid(proposal_started && !proposal_ended);
+
+      // Check if voting period has started.
+      const voting_started = !!res.voting_period_start && res.voting_period_start < now;
+      const voting_ended = !!res.voting_period_end && res.voting_period_end < now;
+      setVotingPeriodIsValid(voting_started && !voting_ended);
     } catch (err) {
       console.warn(err);
     }
@@ -235,6 +244,82 @@ export function Contract(): JSX.Element {
     });
   };
 
+  async function handleStartProposalPeriod() {
+    try {
+      const client = getClient();
+      const res = await client.execute(address, { start_proposal_period: { time: null } });
+      console.log(res);
+      notification.success({
+        message: "Started proposal period!",
+        description: `Transaction ${res.transactionHash}`,
+      });
+      await getInstantiationState();
+    } catch (err) {
+      console.warn(err);
+      notification.error({
+        message: "Error starting proposal period.",
+        description: "There was an error",
+      });
+    }
+  }
+
+  async function handleEndProposalPeriod() {
+    try {
+      const client = getClient();
+      const res = await client.execute(address, { end_proposal_period: { time: null } });
+      console.log(res);
+      notification.success({
+        message: "Ended proposal period!",
+        description: `Transaction ${res.transactionHash}`,
+      });
+      await getInstantiationState();
+    } catch (err) {
+      console.warn(err);
+      notification.error({
+        message: "Error ending proposal period.",
+        description: "There was an error",
+      });
+    }
+  }
+
+  async function handleStartVotingPeriod() {
+    try {
+      const client = getClient();
+      const res = await client.execute(address, { start_voting_period: { time: null } });
+      console.log(res);
+      notification.success({
+        message: "Started voting period!",
+        description: `Transaction ${res.transactionHash}`,
+      });
+      await getInstantiationState();
+    } catch (err) {
+      console.warn(err);
+      notification.error({
+        message: "Error starting voting period.",
+        description: "There was an error",
+      });
+    }
+  }
+
+  async function handleEndVotingPeriod() {
+    try {
+      const client = getClient();
+      const res = await client.execute(address, { end_voting_period: { time: null } });
+      console.log(res);
+      notification.success({
+        message: "Ended voting period!",
+        description: `Transaction ${res.transactionHash}`,
+      });
+      await getInstantiationState();
+    } catch (err) {
+      console.warn(err);
+      notification.error({
+        message: "Error ending voting period.",
+        description: "There was an error",
+      });
+    }
+  }
+
   async function handleCheckDistributions() {
     try {
       const client = getClient();
@@ -320,15 +405,39 @@ export function Contract(): JSX.Element {
               <Text>
                 Proposal period
                 <br />
-                {new Date(instantiationState.proposal_period_start * 1e3).toLocaleString()}
+                {instantiationState.proposal_period_start === null ? (
+                  <Button type="primary" onClick={handleStartProposalPeriod}>
+                    Start Proposal Period
+                  </Button>
+                ) : (
+                  new Date(instantiationState.proposal_period_start * 1e3).toLocaleString()
+                )}
                 &nbsp;&mdash;&nbsp;
-                {new Date(instantiationState.proposal_period_end * 1e3).toLocaleString()}
+                {instantiationState.proposal_period_end === null ? (
+                  <Button type="primary" onClick={handleEndProposalPeriod}>
+                    End Proposal Period
+                  </Button>
+                ) : (
+                  new Date(instantiationState.proposal_period_end * 1e3).toLocaleString()
+                )}
               </Text>
               <Text>
                 Voting period <br />
-                {new Date(instantiationState.voting_period_start * 1e3).toLocaleString()}
+                {instantiationState.voting_period_start === null ? (
+                  <Button type="primary" onClick={handleStartVotingPeriod}>
+                    Start Voting Period
+                  </Button>
+                ) : (
+                  new Date(instantiationState.voting_period_start * 1e3).toLocaleString()
+                )}
                 &nbsp;&mdash;&nbsp;
-                {new Date(instantiationState.voting_period_end * 1e3).toLocaleString()}
+                {instantiationState.voting_period_end === null ? (
+                  <Button type="primary" onClick={handleEndVotingPeriod}>
+                    End Voting Period
+                  </Button>
+                ) : (
+                  new Date(instantiationState.voting_period_end * 1e3).toLocaleString()
+                )}
               </Text>
               {/* <FormSearchName initialName={name} setSearchedName={setLowercaseSearchedName} /> */}
             </SearchStack>
