@@ -138,15 +138,19 @@ export function FormNewInstantiation({
             // setSearchedName(values.name);
             console.log("create instantiation", values);
 
+            const isSet = (value, index) => {
+              return value != undefined && value.length > index;
+            };
+
             const params = {
               name: values.name,
               // description: values.description,
               proposerWhitelist: values.proposerWhitelist.split(",").map((s) => s.trim()),
               voterWhitelist: values.voterWhitelist.split(",").map((s) => s.trim()),
-              proposalPeriodStart: values.proposalPeriod[0].unix(),
-              proposalPeriodEnd: values.proposalPeriod[1].unix(),
-              votingPeriodStart: values.votingPeriod[0].unix(),
-              votingPeriodEnd: values.votingPeriod[1].unix(),
+              proposalPeriodStart: isSet(values.proposalPeriod, 0) ? values.proposalPeriod[0].unix() : null,
+              proposalPeriodEnd: isSet(values.proposalPeriod, 1) ? values.proposalPeriod[1].unix() : null,
+              votingPeriodStart: isSet(values.votingPeriod, 0) ? values.votingPeriod[0].unix() : null,
+              votingPeriodEnd: isSet(values.votingPeriod, 1) ? values.votingPeriod[1].unix() : null,
               budgetAmount: values.budgetAmount,
               budgetDenom: "ucosm",
             };
